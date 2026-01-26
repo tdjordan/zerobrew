@@ -34,15 +34,19 @@ zb reset         # uninstall everything
 zb gc                # garbage collect unused store entries
 ```
 
-## why is it faster?
+## Why is it faster?
 
 - **Content-addressable store**: packages are stored by sha256 hash (at `/opt/zerobrew/store/{sha256}/`). Reinstalls are instant if the store entry exists.
 - **APFS clonefile**: materializing from store uses copy-on-write (zero disk overhead).
 - **Parallel downloads**: deduplicates in-flight requests, races across CDN connections.
 - **Streaming execution**: downloads, extractions, and linking happen concurrently.
 
+## Notes on LLMs
 
-## storage layout
+I spent a lot of time thinking through this architecture, testing, and debugging. I also used Claude Opus 4.5 to write much of the code here. I am a big believer in language models for coding, especialy when they are given a precise spec and work with human input! See some of the discussion about this [on Reddit](https://www.reddit.com/r/rust/comments/1qn2aev/zerobrew_is_a_rustbased_520x_faster_dropin/) that convinced me it was worth adding to the README. A lot of people I respect, [including the developers of uv](https://x.com/charliermarsh/status/2007117912801427905) are doing similar sorts of development, I don't think this is a particularly crazy practice in 2026. 
+
+
+## Storage layout
 
 ```
 /opt/zerobrew/
