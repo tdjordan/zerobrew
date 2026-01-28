@@ -229,22 +229,37 @@ fn add_to_path(prefix: &Path) -> Result<(), String> {
     if !already_added {
         // Append to config
         let addition = format!("\n# zerobrew\n{}\n", path_export);
-        std::fs::OpenOptions::new()
+
+        let write_result = std::fs::OpenOptions::new()
             .create(true)
             .append(true)
             .open(&config_file)
             .and_then(|mut f| {
                 use std::io::Write;
                 f.write_all(addition.as_bytes())
-            })
-            .map_err(|e| format!("Failed to update {}: {}", config_file, e))?;
+            });
 
-        println!(
-            "    {} Added {} to PATH in {}",
-            style("✓").green(),
-            bin_path.display(),
-            config_file
-        );
+        if let Err(e) = write_result {
+            println!(
+                "{} Could not write to {} due to error: {}",
+                style("Warning:").yellow().bold(),
+                config_file,
+                e
+            );
+            println!(
+                "{} Please add the following line to {}:",
+                style("Info:").cyan().bold(),
+                config_file
+            );
+            println!("{}", addition);
+        } else {
+            println!(
+                "    {} Added {} to PATH in {}",
+                style("✓").green(),
+                bin_path.display(),
+                config_file
+            );
+        }
     }
 
     // Always check if PATH is actually set in current shell
